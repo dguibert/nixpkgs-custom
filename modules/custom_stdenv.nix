@@ -108,8 +108,8 @@ in
     type = lib.types.bool;
     default = !isNixStore;
   };
-  config = {
-    pkgs = lib.mkIf config.custom_stdenv.enable {
+  config = lib.mkIf config.custom_stdenv.enable {
+    pkgs = {
       config = custom_config;
       overlays = [ overlay ];
     };

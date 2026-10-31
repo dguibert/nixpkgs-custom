@@ -10,8 +10,19 @@
     {
       pkgs,
       system,
+      lib,
       ...
     }:
+    let
+      isNixStore = builtins.storeDir == "/nix/store";
+      pre-commit-check-shellHook = inputs.self.checks.${system}.pre-commit-check.shellHook;
+      pre-commit-check-enabledPackages = inputs.self.checks.${system}.pre-commit-check.enabledPackages;
+      name =
+        if isNixStore then
+          "pre-commit"
+        else
+          "pre-commit-${builtins.replaceStrings [ "/" ] [ "-" ] (builtins.dirOf builtins.storeDir)}";
+    in
     {
       checks = {
         pre-commit-check = inputs.git-hooks-nix.lib.${system}.run {
@@ -41,6 +52,19 @@
             };
           };
         };
+      };
+      devShells.pre-commit = pkgs.mkShell rec {
+        inherit name;
+        ENVRC = name;
+
+        buildInputs = [ ] ++ lib.optional isNixStore pre-commit-check-enabledPackages;
+        shellHook = ''
+          ${if isNixStore then pre-commit-check-shellHook else ""}
+
+          unset NIX_INDENT_MAKE
+          unset IN_NIX_SHELL NIX_REMOTE
+        '';
+
       };
     };
 }

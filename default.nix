@@ -7,7 +7,10 @@ let
   config = { };
   overlays = lib.attrsets.attrValues flake.overlays;
 in
-  import nixpkgs.outPath (args // {
-    config = config // (args.config or {});
-    overlays = overlays ++ (args.overlays or []);
-  })
+import nixpkgs.outPath (
+  args
+  // {
+    config = config // (args.config or { });
+    overlays = overlays ++ (args.overlays or [ ]);
+  }
+)

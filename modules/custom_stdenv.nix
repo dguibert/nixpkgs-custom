@@ -42,8 +42,7 @@ let
     in
     (if isDowngrade then warn else pass) upgraded;
 
-  overlays = [
-    (final: prev: {
+  overlay = final: prev: {
       nss_sss = prev.callPackage ./custom_stdenv/_nss-client.nix { };
 
       whoami_ = builtins.derivation {
@@ -100,10 +99,10 @@ let
           libllvm = dontCheck prev.libllvm;
         }
       );
-    })
-  ];
+    };
 in
 {
+
   options.custom_stdenv.enable = lib.mkOption {
     description = "Enable custom_stdenv pkgs";
     type = lib.types.bool;
@@ -112,18 +111,19 @@ in
   config = {
     pkgs = lib.mkIf config.custom_stdenv.enable {
       config = custom_config;
-      overlays = overlays;
+      overlays = [ overlay ];
     };
 
+    flake.overlays.custom_stdenv = overlay;
     # https://flake.parts/system
     flake.aspects.custom_stdenv.nixos = {
       nixpkgs.config = custom_config;
-      nixpkgs.overlays = overlays;
+      nixpkgs.overlays = [ overlay ];
     };
 
     flake.aspects.custom_stdenv.homeManager = {
       nixpkgs.config = custom_config;
-      nixpkgs.overlays = overlays;
+      nixpkgs.overlays = [ overlay ];
     };
   };
 }

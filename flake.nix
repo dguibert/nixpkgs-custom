@@ -14,6 +14,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     import-tree.url = "github:denful/import-tree";
+    nix = {
+      url = "github:dguibert/nix/pu";
+      inputs = {
+        flake-compat.follows = "git-hooks-nix/flake-compat";
+        flake-parts.follows = "flake-parts";
+        git-hooks-nix.follows = "git-hooks-nix";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
     nixpkgs.url = "github:dguibert/nixpkgs/pu";
   };
 }

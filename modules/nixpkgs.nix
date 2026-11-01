@@ -39,6 +39,9 @@ in
       nixpkgs.url = "github:dguibert/nixpkgs/pu";
     };
 
+    # export upstream nixpkgs.lib
+    flake.lib = inputs.nixpkgs.lib;
+
     pkgs.config = nixpkgs_config;
     pkgs.overlays = overlays;
 

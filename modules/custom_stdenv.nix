@@ -100,6 +100,10 @@ let
       }
     );
   };
+  customStdenvModule = { ... }: {
+    nixpkgs.config = custom_config;
+    nixpkgs.overlays = [ overlay ];
+  };
 in
 {
 
@@ -108,22 +112,16 @@ in
     type = lib.types.bool;
     default = !isNixStore;
   };
-  config = lib.mkIf config.custom_stdenv.enable {
-    pkgs = {
+  config = {
+    pkgs = lib.mkIf config.custom_stdenv.enable {
       config = custom_config;
       overlays = [ overlay ];
     };
 
-    flake.overlays.custom_stdenv = overlay;
-    # https://flake.parts/system
-    flake.aspects.custom_stdenv.nixos = {
-      nixpkgs.config = custom_config;
-      nixpkgs.overlays = [ overlay ];
+    flake.overlays = lib.mkIf config.custom_stdenv.enable {
+      custom_stdenv = overlay;
     };
-
-    flake.aspects.custom_stdenv.homeManager = {
-      nixpkgs.config = custom_config;
-      nixpkgs.overlays = [ overlay ];
-    };
+    flake.modules.nixos.custom_stdenv = customStdenvModule;
+    flake.modules.homeManager.custom_stdenv = customStdenvModule;
   };
 }

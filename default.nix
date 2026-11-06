@@ -1,7 +1,7 @@
 { ... }@args:
 let
   # Load the flake in the current directory
-  flake = builtins.getFlake (/. + builtins.unsafeDiscardStringContext ./.);
+  flake = builtins.getFlake (toString (/. + builtins.unsafeDiscardStringContext ./.));
   nixpkgs = flake.inputs.nixpkgs;
   lib = nixpkgs.lib;
   config = { };
